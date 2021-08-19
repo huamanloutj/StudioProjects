@@ -1,0 +1,21 @@
+ListView 中设置setonitemclicklistener()监听时，无法获取item条目的点击事件焦点
+解决办法：
+问题概括 ：   ListView 中item条目中存在Button、CheckBox等控件时，设置setonitemclicklistener()时，无法获取item条目的点击事件焦点
+
+主要是由于这些控件（Button、CheckBox等控件）获取焦点的权值会比 ListView 的item的权值高，所以点击事件先被这些控件捕获了，所以ListView的item的点击事件就失效了。
+
+
+解决方案：1、如果希望item的点击事件有效且Button、CheckBox等控件的点击、勾选等事件也有效，并且两事件不会冲突：将Button、CheckBox等控件的
+
+android：focuable="false"。
+
+2、如果仅希望item的点击事件有效，则将将Button、CheckBox等控件的android：focusable="false",android：clickable="false",android：focusableInTouchMode="false"。（其中focusable是关键）     
+
+3.<ReadGpuID:218>: Failed to read chip ID from gpu_model. Fallback to use the GSL path未解决
+
+4.可以得出软件包的名字、图标，然后点击启动https://www.jb51.net/article/88187.htm，搜索内容安卓在ListView中点击启动应用
+
+5.部分应用打不开，Attempt to invoke virtual method 'java.lang.String android.content.Intent.toString()' on a null object reference
+
+
+

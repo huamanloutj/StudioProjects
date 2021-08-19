@@ -1,0 +1,2 @@
+rootProject.name = "CommandExecution"
+include ':app'
