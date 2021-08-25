@@ -1,0 +1,166 @@
+github链接：https://github.com/mzlogin/awesome-adb#%E4%BB%A5-root-%E6%9D%83%E9%99%90%E8%BF%90%E8%A1%8C-adbd
+
+
+ADB简介
+为了能通过shell对Android设备进行调试和操作，则需要ADB工具（Android Debug Bridge）作为桥梁连接Android设备和PC端。
+
+环境配置
+PC端安装ADB软件，安装完成后设置adb主程序所在路径至环境变量中，方便cmd中直接使用adb命令；设置需要连接的Android设备处于开发者模式。
+
+常用命令
+1. 登录设备
+adb shell
+adb -s 设备名 shell
+
+2. 取得root权限
+某些时候需要root权限对Android系统进行操作，例如使用chmod命令时。使用adb shell命令连接Android设备依次执行以下命令可取得root权限。
+
+adb root
+adb disable-verity
+adb reboot
+adb root
+adb remount
+
+需注意的是user版Android系统是无法取得root权限的！
+3. 查看连接的设备
+adb devices
+
+4. 从PC端发送文件到设备端
+adb push 本地文件路径 远程文件路径
+
+5. 从设备端拉取文件到PC端
+adb pull 远程文件路径 本地文件路径
+
+6. 查看第三方应用
+adb shell pm list packages -3
+
+7. 获取应用版本号
+adb shell pm dump com.android.dialer | findstr “versionName”
+
+需知道应用的包名
+8. 列出系统应用
+adb shell pm list packages -s
+
+9. 查看cpu的架构信息和GPU信息
+adb shell cat /proc/cpuinfo
+adb shell dumpsys | findstr GLES // 获取GPU信息
+
+10. 查看设备的操作系统
+adb shell uname
+-r 查看操作系统的版本
+-m 查看操作系统的位数
+
+11. 查看内存信息
+dumpsys meminfo
+
+12. getprop命令
+ro.product.model------设备型号
+ro.product.brand------设备品牌
+ro.product.name------设备名
+
+13. 查看日志
+adb shell logcat
+
+14. 查看内核版本
+adb shell cat proc/version
+
+15. adb shell中settings命令
+查看屏幕待机时间：
+settings get system screen_off_timeout
+查看wifi开关情况：
+settings get global wifi_on
+当前背光亮度：
+settings get system screen_brightness
+
+16. 抓取kernel log
+adb shell dmesg > /data/local/tmp/dmesg.txt
+或者：
+cat proc/kmsg
+
+17. 进入fastboot模式
+adb reboot bootloader //
+之后可使用以下方式烧录：
+fastboot flash 分区名 烧录文件名
+
+18 安装卸载应用
+adb install 电脑中apk的路径 //安装电脑中的apk到手机
+
+有时候会出现Read－only的错误，我们可以使用强制安装命令来安装apk
+adb install -r 电脑中apk的路径
+// 对于有些仅用于测试的apk，需使用-t选项
+
+查看已安装应用
+adb shell pm list packages
+
+卸载应用
+adb uninstall apk完整包名
+
+无论安装还是卸载最终都会显示Success
+-t参数用于测试包
+
+首先：adb shell pm list packages -s 找到要删除的包名
+获取包名的地址：adb shell pm path com.xx.xx
+挂载系统读写权限：adb remount
+删除包：adb shell rm /system/app/OldDriver/OldDriver.apk
+最后adb reboot重启就OK
+
+19. dumpsys命令
+adb shell dumpsys package com.examle.xx
+// 输出信息中versionName就是应用版本号
+adb shell dumpsys power
+// 查看WakeLock锁的个数等
+
+20. 查看Android系统版本和api
+获取系统版本：adb shell getprop ro.build.version.release
+获取系统api版本：adb shell getprop ro.build.version.sdk
+也可查看配置文件：cat system/build.prop
+
+21. 查看当前启动APP的应用名和包名
+dumpsys window -w | grep “name=”
+例如以下结果：
+mSurface=Surface(name=com.xxx.elauncher/com.xxx.elauncher.activity.MainActivity)/@0xcc80e9b
+
+22. 截屏
+adb shell screencap -p /sdcard/01.png
+// 截取当前的屏幕
+
+23. 杀掉进程
+知道进程号：adb shell kill pid
+adb shell am force-stop 包名
+
+24. adb模拟按键事件
+这条命令相当于按了设备的Backkey键
+adb shell input keyevent 4
+可以解锁屏幕
+adb shell input keyevent 82
+
+25. 启动进程
+例如启动计算器
+adb shell am start -n com.android.calculator2/com.android.calculator2.Calculator
+
+26. 查看应用版本
+adb shell dumpsys com.seewo.elauncher | findstr version
+
+27. 发送广播
+adb shell am broadcast -a com.XXXX
+
+adb网络连接设备方法
+方法一
+Android设备端下载“无线ADB”工具，需要root权限
+方法二
+不需要root权限
+手机打开开发者模式，然后打开USB调试
+使用USB数据线连接手机和电脑
+在PC端打开cmd命令窗口，输入adb devices ，可以看到已经连接的设备
+输入adb tcpip 8888 （设置端口号为8888）
+断开手机和电脑的连接
+输入adb connect 设备IP地址:8888，连接成功
+使用busybox
+为了可以在adb shell端使用Linux命令，可以安装busybox工具到Android系统；去官网下载编译好的busybox工具，push到Android端，进入shell对应目录执行以下命令
+
+chmod 775 busybox-armv8l
+./busybox-armv8l --install
+
+adb中执行二进制文件
+需将bin文件拷贝到/data/local/tmp目录下，修改文件权限：chmod 777
+

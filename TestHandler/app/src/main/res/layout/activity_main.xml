@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <Button
+        android:id="@+id/button_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="handle msg in main thread"/>
+    <Button
+        android:id="@+id/button_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="handle msg in sub thread"/>
+    <Button
+        android:id="@+id/button_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="handler comes from other thread"/>
+    <Button
+        android:id="@+id/button_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="refresh ActivityUI in other thread"/>
+</LinearLayout>
+

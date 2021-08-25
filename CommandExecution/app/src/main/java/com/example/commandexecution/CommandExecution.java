@@ -9,9 +9,9 @@ import java.io.InputStreamReader;
 
 public class CommandExecution {
 
-    public static final String TAG = "CommandExecution";
+    public static final String TAG = "CommandExecution-----";
 
-    public final static String COMMAND_SU       = "echo $PATH";
+    public final static String COMMAND_SU       = "su";
     public final static String COMMAND_SH       = "sh";
     public final static String COMMAND_EXIT     = "exit\n";
     public final static String COMMAND_LINE_END = "\n";
@@ -58,6 +58,7 @@ public class CommandExecution {
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
                 if (command != null) {
+                    Log.i("--------Commonds------", command);
                     os.write(command.getBytes());
                     os.writeBytes(COMMAND_LINE_END);
                     os.flush();

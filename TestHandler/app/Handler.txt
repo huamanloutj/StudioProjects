@@ -1,0 +1,9 @@
+https://www.imooc.com/article/25134?block_id=tuijian_wz
+
+adb logcat | grep "test1"
+adb logcat | grep " 17626 "
+as ps -A | grep com.example.testhandle
+as ps -A -T | grep 17319
+as am stack list
+
+

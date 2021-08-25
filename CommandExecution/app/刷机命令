@@ -1,0 +1,23 @@
+1.
+adb shell
+su
+对比
+adb root
+
+
+2. adb remount 重新挂载 system 
+第一次remount 后需要重启
+
+
+再 root、remount
+
+刷机：
+使用abd reboot bootloader进入fastboot模式
+使用./flash_all.sh再进行刷机
+
+3.adb remount
+adb push 本地文件系统 手机文件系统
+adb pull 手机文件系统 本地文件系统
+adb reboot 直接重启
+adb root 直接进入root权限
+

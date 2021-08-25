@@ -1,11 +1,15 @@
 package com.example.commandexecution;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,31 +18,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Log.d("TAG:", CommandExecution.execCommand("echo 1+1",true).toString());
-        String[] cmds = {"mkdir ~/test\n","echo 1+1"};
-        try {
-            doCmds(cmds);
-        }catch (Exception e){
+        String[] cmds = {"wm size","cd storage","touch 1.txt"};
+        /*动态输入命令*/
+        Log.i("CommandExecution******",CommandExecution.execCommand(cmds,true).successMsg);
 
-        }
         setContentView(R.layout.activity_main);
     }
-    public void test(){
-        Log.d("tag::::::::","Hello Test");
-    }
-    public  void doCmds(String[] cmds) throws Exception {
-        Process process = Runtime.getRuntime().exec("sh");//不是root用户执行的是sh
-        DataOutputStream os = new DataOutputStream(process.getOutputStream());
-
-        for (String tmpCmd : cmds) {
-            Log.i("Tag******",tmpCmd + " ");
-            os.writeBytes(tmpCmd+"\n");
-        }
-
-        os.writeBytes("exit\n");
-        os.flush();
-        os.close();
-
-        process.waitFor();
-    }
+//    public  void doCmds(String[] cmds) throws Exception {
+//        try {
+//            Process process = Runtime.getRuntime().exec("su");//不是root用户执行的是sh
+//
+//            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+//            for (String tmpCmd : cmds) {
+//                Log.i("Tag******",tmpCmd + " ");
+//                os.writeBytes(tmpCmd+"\n");
+//            }
+//
+//            os.writeBytes("exit\n");
+//            os.flush();
+//            os.close();
+//            BufferedReader successResult = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            String s;
+//            StringBuilder successMessage = new StringBuilder();
+//            while((s = successResult.readLine()) != null) successMessage.append(s);
+//            Log.d("******result*****",successMessage.toString());
+//        }catch (Throwable e){
+//            e.printStackTrace();
+//        }
+//
+//        //process.waitFor();
+//    }
 }
