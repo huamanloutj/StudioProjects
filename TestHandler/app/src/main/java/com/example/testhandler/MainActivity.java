@@ -50,6 +50,12 @@ public class MainActivity extends Activity implements OnClickListener{
                 // 主线程中创建MyHandler对象，mHandler创建Handler消息类型为1、消息对象为字符串的Message对象
                 //mHandler = new MyHandler();
                 msg = mHandler.obtainMessage(1, (Object)"Main thread send message by Message Object");
+                //https://blog.csdn.net/h3c4lenovo/article/details/7914902为什么使用obtainMessage，
+                /**
+                 * Returns a new {@link android.os.Message Message} from the global message pool. More efficient than
+                 * creating and allocating new instances. The retrieved message has its handler set to this instance (Message.target == this).
+                 * If you don't want that facility, just call Message.obtain() instead.
+                 */
                 msg.sendToTarget(); //Handler 发送消息
                 break;
             case R.id.button_2:
