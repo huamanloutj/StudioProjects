@@ -1,0 +1,3 @@
+错误类型：no XXX in java.library.path
+解决方法 得到路径然后讲动态链接库复制一份到任意的一个文件中
+链接 https://www.cnblogs.com/linyh99/p/14117875.html
