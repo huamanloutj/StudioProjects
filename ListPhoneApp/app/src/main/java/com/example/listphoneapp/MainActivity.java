@@ -18,16 +18,19 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.os.UserManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,28 +58,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listView = new ListView(this);
+//        listView = new ListView(this);
         data = new ArrayList<Map<String,Object>>();
         listPackages();
-        SimpleAdapter adapter = new SimpleAdapter(
-                this,
-                data,
-                R.layout.vlist,
-                new String[]{"appname", "pname", "icon"},
-                new int[]{R.id.appname, R.id.pname, R.id.icon}
-        );
-        adapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-            public boolean setViewValue(View view, Object data,
-                                        String textRepresentation) {
-                if (view instanceof ImageView && data instanceof Drawable) {
-                    ImageView iv = (ImageView) view;
-                    iv.setImageDrawable((Drawable) data);
-                    return true;
-                } else
-                    return false;
-            }
-        });
-        listView.setAdapter(adapter);
+//        SimpleAdapter adapter = new Adapter2(
+//                this,
+//                data,
+//                R.layout.vlist,
+//                new String[]{"appname", "pname", "icon"},
+//                new int[]{R.id.appname, R.id.pname, R.id.icon}
+//        );
+//        adapter.setViewBinder(new SimpleAdapter.ViewBinder() {
+//            public boolean setViewValue(View view, Object data,
+//                                        String textRepresentation) {
+//                if (view instanceof ImageView && data instanceof Drawable) {
+//                    ImageView iv = (ImageView) view;
+//                    iv.setImageDrawable((Drawable) data);
+//                    return true;
+//                } else
+//                    return false;
+//            }
+//        });
+        setContentView(R.layout.activity_main);
+
+        listView = findViewById(R.id.app_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             //为什么不是显示调用这个函数,逻辑调用关系。
@@ -94,7 +99,10 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.d("check：","点击了确定按钮！！！！" + which);//which的值是-1
+                        Log.d("check：","点击了确定按钮！！！！");//which的值是-1
+                        //createSpinner();
+                        //1.这里弹框，提示选择比例
+                        //2.点击选择对应的比例，然后响应，再进入app。
                         //启动系统应用失败，返回Attempt to invoke virtual method 'java.lang.String
                         // android.content.Intent.toString()' on a null object reference
                         Intent intent = getPackageManager().getLaunchIntentForPackage(pname);
@@ -103,12 +111,6 @@ public class MainActivity extends AppCompatActivity {
                             // start
                         } else {
                             Toast.makeText(MainActivity.this,"系统应用，无法打开",Toast.LENGTH_LONG).show();
-//                            Toast toast = Toast.makeText(global_context, str, showTime);
-//                            toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL , 0, 0);  //设置显示位置
-//                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-//                            v.setTextColor(Color.YELLOW);     //设置字体颜色
-//                            toast.show();
-                            // Toast
                         }
 
                     }
@@ -124,9 +126,33 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-        //listView.setAdapter(new Adapter2());
-        setContentView(listView);
-        //setContentView(R.layout.vlist);
+        listView.setAdapter(new Adapter2());
+        //listView.setAdapter(adapter);
+    }
+    private void createSpinner(){
+        Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+        Log.e("spinner:",spinner + " ");
+        // 建立数据源
+        String[] mItems = {"4:3","16:9","18:9","21:9"};
+        //String[] mItems = getResources().getStringArray(R.array.ratio);
+        // 建立Adapter并且绑定数据源
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, mItems);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        //绑定 Adapter到控件
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+
+                //String[] ratio = getResources().getStringArray(R.array.ratio);
+                Toast.makeText(MainActivity.this, "你选择的是:"+mItems[pos], Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
     }
     class PInfo {
         private String appname = "";
@@ -142,91 +168,105 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    ArrayList<PInfo> apps = new ArrayList<>();
-    private void listPackages() {
-        apps = getInstalledApps(false);
-        final int max = apps.size();
-        for (int i = 0; i < max; i++) {
-            //apps.get(i).prettyPrint();
-            item = new HashMap<String, Object>();
-            item.put("appname", apps.get(i).appname);
-            item.put("pname", apps.get(i).pname);
-            item.put("versionName",apps.get(i).versionName);
-            item.put("icon",apps.get(i).icon);
-            //item.put("bm",apps.get(i).icon);
-            //apps.get(i).prettyPrint();
+    ArrayList<PInfo> pInfos = new ArrayList<>();
+    private void listPackages(){
+        pInfos = getSystemApp(this);
+        final int max = pInfos.size();
+        for (int i = 0 ; i < max ; i ++){
+            item = new HashMap<String,Object>();
+            item.put("appname",pInfos.get(i).appname);
+            item.put("pname",pInfos.get(i).pname);
+            item.put("versionName",pInfos.get(i).icon);
             data.add(item);
         }
     }
-
-//    class Adapter2 extends BaseAdapter {
-//
-//
-//        @Override
-//        public int getCount() {
-//            return apps.size();
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return apps.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return 0;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            View v;
-//            if (convertView == null) {
-//                v = getLayoutInflater().inflate(R.layout.vlist, null);
-//            }else {
-//                v = convertView;
-//            }
-//            TextView t1 = v.findViewById(R.id.appname);
-//            t1.setText(apps.get(position).appname);
-//            t1.setTextColor(0xff0000ff);
-//package com.example.showdialog;
-//            ImageView icon = v.findViewById(R.id.icon);
-//            icon.setImageDrawable(apps.get(position).icon);
-//            return v;
-//        }
-//    }
-    private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
-
-        ArrayList<PInfo> res = new ArrayList<PInfo>();
-        List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
-        for (int i = 0; i < packs.size(); i++) {
-
-            PackageInfo p = packs.get(i);
-            if ((!getSysPackages) && (p.versionName == null)) {
-                continue;
-            }
-            PInfo newInfo = new PInfo();
-            newInfo.appname = p.applicationInfo.loadLabel(getPackageManager()).toString();
-            newInfo.pname = p.packageName;
-            newInfo.versionName = p.versionName;
-            newInfo.versionCode = p.versionCode;
-            newInfo.icon = p.applicationInfo.loadIcon(getPackageManager());
-            //newInfo.icon = p.applicationInfo.loadIcon(getPackageManager());//R.drawable.ic_launcher_background;
-            Log.d("tag:", "icon=" + newInfo.icon + " " + (newInfo.icon instanceof Drawable));
-            //BitmapDrawable bd = (BitmapDrawable) newInfo.icon;
-            //newInfo.bm = bd.getBitmap();
-            res.add(newInfo);
+    class Adapter2 extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return pInfos.size();
         }
 
-        return res;
+        @Override
+        public Object getItem(int position) {
+            return pInfos.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v;
+            if (convertView == null) {
+                v = getLayoutInflater().inflate(R.layout.vlist, null);
+            }else {
+                v = convertView;
+            }
+            TextView t1 = v.findViewById(R.id.appname);
+            t1.setText(pInfos.get(position).appname);
+            //t1.setTextColor(0xff0000ff);//颜色的代码不对，全是0的话无法正常显示，但是在vlist代码里面改成全0就可以
+            TextView t2 = v.findViewById(R.id.pname);
+            t2.setText(pInfos.get(position).pname);
+            //t2.setTextColor(0xff0000ff);
+            ImageView icon = v.findViewById(R.id.icon);
+            icon.setImageDrawable(pInfos.get(position).icon);
+            return v;
+        }
+    }
+    public  ArrayList getSystemApp(Context context){
+        PackageManager mPackageManager = context.getApplicationContext().getPackageManager();
+        LauncherApps mLauncherApps = (LauncherApps) context.getSystemService(Context.LAUNCHER_APPS_SERVICE);
+        UserManager mUserManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+        List<UserHandle> users = mUserManager.getUserProfiles();
+        List<UserHandle> profiles= users == null ? Collections.<UserHandle>emptyList() : users;
+        Log.i("tag","users:"+ users);
+        ArrayList<PInfo> list = new ArrayList<>();
+        //根据手机所有用户获取每个用户下的应用
+        for (UserHandle user : profiles) {
+            // Query for the set of apps
+            final List<LauncherActivityInfo> apps = mLauncherApps.getActivityList(null, user);
+            // Fail if we don't have any apps
+            // TODO: Fix this. Only fail for the current user.
+            if (apps == null || apps.isEmpty()) {
+                continue;
+            }
+            // Create the ApplicationInfos
+            for (int i = 0; i < apps.size(); i++) {
+
+                LauncherActivityInfo app = apps.get(i);
+                PInfo newInfo = new PInfo();
+                // This builds the icon bitmaps.
+                ComponentName componentName = app.getComponentName();
+                String appName =getSystemApplicationName(componentName.getPackageName(),mPackageManager);
+                if(!TextUtils.isEmpty(appName)){
+                    newInfo.appname = app.getApplicationInfo().loadLabel(getPackageManager()).toString();
+                    newInfo.pname = app.getComponentName().getPackageName();
+                    newInfo.icon = (Drawable) app.getApplicationInfo().loadIcon(getPackageManager());
+
+                }
+                Log.d("tag:","icon=" + newInfo.icon + " " + (newInfo.icon instanceof Drawable));
+                list.add(newInfo);
+            }
+        }
+        return list;
     }
 
-    private String getSystemApplicationName(String packageName, PackageManager packageManager) {
+    public static String getSystemApplicationName(String packageName, PackageManager packageManager) {
         String applicationName = null;
-        try{
-            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packageName,0);//这里需要捕获异常才不会出错
-        }catch (PackageManager.NameNotFoundException e){
+        try {
+            ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packageName, 0);
+            //filter system app
+//            if ((applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0 ||
+//                    (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+            applicationName = (String) packageManager.getApplicationLabel(applicationInfo);
+            //}
+
+        } catch (PackageManager.NameNotFoundException e) {
 
         }
         return applicationName;
     }
+
 }

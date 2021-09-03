@@ -87,7 +87,9 @@ public class ListPhoneAppVersion2 extends AppCompatActivity {
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.d("check：","点击了确定按钮！！！！" + which);//which的值是-1
+                        Log.d("check：","点击了确定按钮！！！！");//which的值是-1
+                        //1.这里弹框，提示选择比例
+                        //2.点击选择对应的比例，然后响应，再进入app。
                         //启动系统应用失败，返回Attempt to invoke virtual method 'java.lang.String
                         // android.content.Intent.toString()' on a null object reference
                         Intent intent = getPackageManager().getLaunchIntentForPackage(pname);
@@ -96,12 +98,6 @@ public class ListPhoneAppVersion2 extends AppCompatActivity {
                             // start
                         } else {
                             Toast.makeText(ListPhoneAppVersion2.this,"系统应用，无法打开",Toast.LENGTH_LONG).show();
-//                            Toast toast = Toast.makeText(global_context, str, showTime);
-//                            toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL , 0, 0);  //设置显示位置
-//                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-//                            v.setTextColor(Color.YELLOW);     //设置字体颜色
-//                            toast.show();
-                            // Toast
                         }
 
                     }

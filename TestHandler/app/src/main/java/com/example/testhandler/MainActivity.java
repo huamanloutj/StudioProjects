@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.MessageQueue;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 public class MainActivity extends Activity implements OnClickListener{
+    static final String HandlerTest = "HandlerTest";
+    static final String ThreadTest = "ThreadTest";
+    static final String LooperTest = "LooperTest";
+    static final String MessageQueueTest = "MessageQueueTest";
     private Button button1 = null;
     private Button button2 = null;
     private Button button3 = null;
@@ -31,11 +36,10 @@ public class MainActivity extends Activity implements OnClickListener{
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
         //button4.setOnClickListener(this);
-        Log.e("test1","onCreate");
     }
     @Override
     public void onClick(View v) {
-        Log.e("test1","onClick");
+        //v理解成从手机传过来的参数，可以从中获取
         dealOnClick(v.getId());
     }
     /**
@@ -43,7 +47,15 @@ public class MainActivity extends Activity implements OnClickListener{
      * @param msgId
      */
     private void dealOnClick(int msgId) {
-        mHandler = new MyHandler(); //子线程和主线程都可以操作这个mHandler，当然也可以在switch的具体case中才创建
+        mHandler = new MyHandler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+            }
+        };
+
+        //子线程和主线程都可以操作这个mHandler，当然也可以在switch的具体case中才创建
 
         switch(msgId){
             case R.id.button_1:
@@ -57,6 +69,7 @@ public class MainActivity extends Activity implements OnClickListener{
                  * If you don't want that facility, just call Message.obtain() instead.
                  */
                 msg.sendToTarget(); //Handler 发送消息
+                Log.e("MessageTest",msg.getTarget()+"");
                 break;
             case R.id.button_2:
                 InnerThread innerThread = new InnerThread();
@@ -80,12 +93,10 @@ public class MainActivity extends Activity implements OnClickListener{
         public MyHandler(Looper myLooper){
             super(myLooper);  //重写构造方法，通过Looper创建MyHandler对象
         }
-        public MyHandler(){
-
-        }
+        public MyHandler(){}
         @Override
         public void handleMessage(Message msg){
-            Log.e("test1","MyHandler handleMessage " + msg.what);
+            Log.e(HandlerTest,"MyHandler handleMessage " + msg.what);
             String str = "";
             switch(msg.what){
                 case 1:
@@ -110,7 +121,7 @@ public class MainActivity extends Activity implements OnClickListener{
         }
     }
 
-    private class InnerThread extends Thread{
+    public  class InnerThread extends Thread{
         @Override
         public void run(){
 
@@ -121,15 +132,16 @@ public class MainActivity extends Activity implements OnClickListener{
             //mHandler = new MyHandler(Looper.myLooper());
 
             //通过Looper.getMainLooper()获取父类的looper可以成功创建Handler对象并将Message了送到父类
-            Log.e("test1","InnerThread  prepare ");
-            Looper.prepare();
-            Log.e("test1","InnerThread  after prepare ");
+            //Log.e("test1","InnerThread  prepare ");
+            Looper.prepare();//核心代码，将当前线程初始化为Looper线程(将looper对象定义成为ThreadLocal)
+            //Log.e("test1","InnerThread  after prepare ");
             mInnerHandler = new MyHandler();
-//            mHandler = new MyHandler();
-
+//          mHandler = new MyHandler();
+            Log.e("Test Main",Looper.getMainLooper()+"*******"+Looper.getMainLooper().getQueue());
+            Log.e("Test",mInnerHandler.getLooper()+"******"+mInnerHandler.getLooper().getQueue());
             Message msg = mInnerHandler.obtainMessage(2, (Object)"Inner thread send message by Message Object");
             msg.sendToTarget();
-            Looper.loop();
+            Looper.loop();//开始循环处理消息队列
         }
     }
 
@@ -145,11 +157,12 @@ public class MainActivity extends Activity implements OnClickListener{
         }
         @Override
         public void run(){
-            Log.e("test1","SubThread  run ");
+            Log.e("Test SubThread","SubThread  run ");
             Message msg = mInnerHandler.obtainMessage(3, (Object)"Other thread send message by myHandler");
+            Log.e("Test",mInnerHandler.getLooper()+"******"+mInnerHandler.getLooper().getQueue());
             mInnerHandler.sendMessage(msg);
 
-            msg = mInnerHandler.obtainMessage(4, (Object)"Other thread send message by myHandler");
+            msg = mHandler.obtainMessage(4, (Object)"Other thread send message by myHandler");
             mInnerHandler.sendMessageDelayed(msg, 3000);
 
         }
