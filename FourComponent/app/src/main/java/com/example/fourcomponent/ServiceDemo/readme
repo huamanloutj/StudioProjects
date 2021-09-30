@@ -1,0 +1,17 @@
+第二种方式：通过bindService启动Service
+bindService启动服务特点：
+1.bindService启动的服务和调用者之间是典型的client-server模式。调用者是client，service则是server端。service只有一个，但绑定到service上面的client可以有一个或很多个。这里所提到的client指的是组件，比如某个Activity。
+2.client可以通过IBinder接口获取Service实例，从而实现在client端直接调用Service中的方法以实现灵活交互，这在通过startService方法启动中是无法实现的。
+3.bindService启动服务的生命周期与其绑定的client息息相关。当client销毁时，client会自动与Service解除绑定。当然，client也可以明确调用Context的unbindService()方法与Service解除绑定。当没有任何client与Service绑定时，Service会自行销毁。
+
+bindService代码实例
+交互界面设计如下：
+1.创建一个TestTwoService继承Service（Server）
+2.创建ActivityA，可以通过bindService绑定服务（client）
+3.创建ActivityB，可以通过bindService绑定服务（client）
+4.ActivityA可以跳转到ActivityB
+
+TestTwoService创建如下：
+要想让Service支持bindService调用方式，需要做以下事情：
+1.在Service的onBind()方法中返回IBinder类型的实例。
+2.onBInd()方法返回的IBinder的实例需要能够返回Service实例本身。通常，最简单的方法就是在service中创建binder的内部类，加入类似getService()的方法返回Service，这样绑定的client就可以通过getService()方法获得Service实例了。

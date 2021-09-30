@@ -1,0 +1,35 @@
+﻿    • 由 戈鹏创建, 最后修改于十月 11, 2020
+导出系统签名
+Android源码编译时使用的签名密钥位于代码的 build/target/product/security 目录，其中用于进行系统platform签名的密钥为 platform.pk8。
+    1. 首先使用下面的命令生成 platform.pem 文件
+openssl pkcs8 -inform DER -nocrypt -in platform.pk8 -out platform.pem
+       
+    2. 使用下面的命令生成 platform.p12文件，并设置密码和别名，这里设置的密码（android）和别名（androiddebugkey）就是在Android Studio打包时选择的别名和密码
+openssl pkcs12 -export -in  platform.x509.pem -out platform.p12 -inkey  platform.pem -password pass:android -name androiddebugkey
+       
+    3. 使用下面的命令生成 platform.jks 文件，这就是AndroidStudio使用的签名文件
+keytool -importkeystore -deststorepass android -destkeystore ./platform.jks -srckeystore ./platform.p12 -srcstoretype PKCS12 -srcstorepass android
+       
+AndroidStudio配置
+    1. 将上面导出的 platform.jks 文件复制到 AndroidStudio 项目的代码里（如<ProjectCode>/app/keys/debug/platform.jks）
+    2. 参考如下配置模块（例如app）的 build.gradle 文件，添加签名配置 signingConfigs
+android {
+    ...
+    signingConfigs {
+        debug {
+            storeFile file("./keys/debug/platform.jks")
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            storeFile file("./keys/debug/platform.jks")
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+}
+       
+
+

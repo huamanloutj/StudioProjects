@@ -1,0 +1,2 @@
+as am dump processes |grep "\*APP\* UID"
+g  p

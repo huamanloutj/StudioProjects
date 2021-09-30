@@ -1,4 +1,5 @@
 https://www.imooc.com/article/25134?block_id=tuijian_wz
+https://blog.csdn.net/qq_41841048/article/details/102144756#t5(Handler、代码详解)
 
 adb logcat | grep "test1"
 adb logcat | grep " 17626 "

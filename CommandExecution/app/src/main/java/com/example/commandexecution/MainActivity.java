@@ -18,9 +18,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String[] cmds = {"wm size","cd storage","touch 1.txt"};
+        String[] cmds = {"wm size 1200x1920","cd /sdcard","touch 1.txt"};
         /*动态输入命令*/
-        Log.i("CommandExecution******",CommandExecution.execCommand(cmds,true).successMsg);
+        Log.i("CommandExecution******",CommandExecution.execCommand(cmds,false).successMsg);
 
         setContentView(R.layout.activity_main);
     }

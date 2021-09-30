@@ -78,7 +78,7 @@ public class CommandExecution {
             commandResult.successMsg = successMsg.toString();
             commandResult.errorMsg = errorMsg.toString();
             Log.i(TAG, commandResult.result + " | " + commandResult.successMsg
-                    + " | " + commandResult.errorMsg);
+                    + " | " + commandResult.errorMsg + " END");
         } catch (IOException e) {
             String errmsg = e.getMessage();
             if (errmsg != null) {

@@ -1,0 +1,1 @@
+avc: denied { search } for name=migt dev=dm-6 ino=283 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:migt_file:s0 tclass=dir permissive=0 app=com.example.createsystemservice

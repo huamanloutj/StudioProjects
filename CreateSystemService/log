@@ -1,0 +1,10 @@
+I/AdrenoGLES-0: PFP: 0x016ee190, ME: 0x00000000
+E/LB: fail to open file: Permission denied
+W/RenderThread: type=1400 audit(0.0:950): avc: denied { search } for name="migt" dev="dm-10" ino=283 scontext=u:r:platform_app:s0:c512,c768 tcontext=u:object_r:migt_file:s0 tclass=dir permissive=0 app=com.example.createsystemservice
+D/DecorView[]: onWindowFocusChanged hasWindowFocus true
+I/DecorView: showOrHideHighlightView: hasFocus=true; winMode=1; isMrgNull=true
+I/tesystemservic: ProcessProfilingInfo new_methods=1294 is saved saved_to_disk=1 resolve_classes_delay=8000
+W/ActivityThread: PerfMonitor Activity : running com.example.createsystemservice/.MainActivity [81, r=72ms, a=16ms, w=159894ms]
+D/DecorView[]: onWindowFocusChanged hasWindowFocus false
+I/DecorView: showOrHideHighlightView: hasFocus=false; winMode=1; isMrgNull=true
+E/Perf: Perf Service died.

@@ -1,0 +1,11 @@
+v3.0
+作业：
+1.实现一个service，service声明android:process=":remote"
+2.实现一个activity，上面有两个button A，B
+3.点击button A，通过service添加一个悬浮球，悬浮球出现的时候添加一个动画
+4.点击button B，给悬浮球发一个消息 (改变悬浮球颜色)
+
+目的：
+1.熟悉addView流程
+2.熟悉aidl流程(为什么不用handler)
+3.熟悉窗口动画使用

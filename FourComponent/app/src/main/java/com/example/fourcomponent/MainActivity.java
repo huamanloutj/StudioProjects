@@ -1,54 +1,30 @@
 package com.example.fourcomponent;
 
+import static com.example.fourcomponent.Test.TEST;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+
+import com.example.fourcomponent.ServiceDemo.MyService;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //这里修改会报错，主进程与main线程？
         setContentView(R.layout.activity_main);
-
-        Log.d("test","onCreate");
-
-
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("test", "onResume");
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("test", "onPause");
+    public void startService(View view) {
+        Intent intent = new Intent(this,MyService.class);
+        startService(intent);
+        finish();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d("test", "onRestart");
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d("test", "onStart");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("test", "onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("test", "onDestroy");
-    }
 }

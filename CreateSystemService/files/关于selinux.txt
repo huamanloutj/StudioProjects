@@ -1,0 +1,21 @@
+as service list | grep -i thunder
+repo status
+gg activity_task_service
+gg activity
+adb logcat -b all | tee boot.log
+g boot.log
+adb logcat | grep SystemServer
+问题报错标志：若Android设备开发过程中，出现关于SElinux权限报错的问题，如下所示：
+junit.framework.AssertionFailedError: Found illegal SELinux denial(s): avc: denied { write } for name=“tasks” dev=“tmpfs” ino=1568 scontext=u:r:dumpstate:s0 tcontext=u:object_r:device:s0 tclass=file permissive=0
+可将该报错信息报错到一个文件中，
+echo “avc: denied { write } for name=“tasks” dev=“tmpfs” ino=1568 scontext=u:r:dumpstate:s0 tcontext=u:object_r:device:s0 tclass=file permissive=0” >a；（由于下面那个工具偶尔不能识别到，需要重复复制多一行。如下所示）
+————————————————
+版权声明：本文为CSDN博主「听他风吟」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qq_38495527/article/details/99087568
+Android selinux权限设置
+原文链接：https://blog.csdn.net/jaczen/article/details/73028302
+
+需要的执行对象是Android机器，要在adb shell下操作
+方案一：还可以用 adb shell setenforce 0 命令先关闭 selinux
+然后找到 system_server 进程把它 kill，让系统软重启一下。
+不能adb reboot，硬重启时会重新打开 selinux

@@ -16,6 +16,10 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.text.TextUtils;
@@ -52,40 +56,82 @@ import java.util.Map;
  */
 
 public class MainActivity extends AppCompatActivity {
+//    private MyHandler mHandler = null;
+//    private MyHandler subHandler = null;
+    private HandlerThread thread;
+    private Handler subHandler;
+    private Message msg = null;
     private List<Map<String,Object>> data;
     Map<String,Object> item;
     private ListView listView = null;
+    /*
+     *加入ThreadHandler
+     *
+     */
+    //创建主线程的handler
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 2) {
+                Log.e("TAG", "Main Handler" + "," + msg.what + "," + msg.obj.toString());
+                //执行更新UI的代码
+                //Thost告诉代码如何运行
+            } else if (msg.what == 3) {
+                //初始化进入su模式,这里 接收到的命令可能只有一条（？）
+                Log.e("TAG", "From Main,tell us Main to Sub" + "," + msg.what + "," + msg.obj.toString());
+                String cmds = msg.obj.toString();
+                CommandExecution.execCommand(cmds, true);
+                Log.e("CommandExecution******", CommandExecution.execCommand(cmds, true).successMsg);
+                Message message = subHandler.obtainMessage(2,"");
+                //初始化完成，向Sub发送消息。
+                /*
+                两种方式：
+                1.发送消息然后再子线程中执行
+                2.post(r)，r是任务代码，意思是r的代码在UI线程执行的
+                 */
+//                subHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        CommandExecution.execCommand(cmds, true);
+//
+//                    }
+//                });
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        listView = new ListView(this);
         data = new ArrayList<Map<String,Object>>();
         listPackages();
-//        SimpleAdapter adapter = new Adapter2(
-//                this,
-//                data,
-//                R.layout.vlist,
-//                new String[]{"appname", "pname", "icon"},
-//                new int[]{R.id.appname, R.id.pname, R.id.icon}
-//        );
-//        adapter.setViewBinder(new SimpleAdapter.ViewBinder() {
-//            public boolean setViewValue(View view, Object data,
-//                                        String textRepresentation) {
-//                if (view instanceof ImageView && data instanceof Drawable) {
-//                    ImageView iv = (ImageView) view;
-//                    iv.setImageDrawable((Drawable) data);
-//                    return true;
-//                } else
-//                    return false;
-//            }
-//        });
         setContentView(R.layout.activity_main);
-
         listView = findViewById(R.id.app_list);
+        //启动线程，进入到su模式？
+        //创建spinner，发送一个消息
+        //创建子线程的handler
+        createSpinner();
+        Message message = handler.obtainMessage(3,"su");
+        handler.sendMessage(message);
+        thread = new HandlerThread("handler thread");
+        thread.start();
+        //创建子线程的handler
+
+        subHandler = new Handler(thread.getLooper()){
+            @Override
+            public void handleMessage(Message msg){
+                //这里得到msg.的信息并且处理
+                if (msg.what == 1){
+                    Log.e("TAG","Main Handler" + "," + msg.what + "," + msg.obj.toString());
+                    //执行显示和选择一个比例的代码，反馈给主UI
+                }
+                Message message = handler.obtainMessage(2,(Object)"");
+                handler.sendMessageDelayed(message,1000);
+            }
+        };
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             //为什么不是显示调用这个函数,逻辑调用关系。
-
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //修改成parent，也可以实现效果，改成listView？，输出的内容上不一样
                 //String str = parent.getItemAtPosition(position) + "";
@@ -112,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(MainActivity.this,"系统应用，无法打开",Toast.LENGTH_LONG).show();
                         }
-
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -130,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         //listView.setAdapter(adapter);
     }
     private void createSpinner(){
+
         Spinner spinner = (Spinner) findViewById(R.id.spinner1);
         Log.e("spinner:",spinner + " ");
         // 建立数据源
@@ -140,10 +186,17 @@ public class MainActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         //绑定 Adapter到控件
         spinner.setAdapter(adapter);
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id) {
+
+                Message message = handler.obtainMessage(3,"su");
+                message.arg1 = pos;
+                handler.sendMessage(message);
+
+
 
                 //String[] ratio = getResources().getStringArray(R.array.ratio);
                 Toast.makeText(MainActivity.this, "你选择的是:"+mItems[pos], Toast.LENGTH_LONG).show();
@@ -154,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     class PInfo {
         private String appname = "";
         private String pname = "";
